@@ -1,5 +1,5 @@
 import numpy as np
-from test import *
+from lib import *
 
 # Our Neural Network class
 class Neural_Network(object):
@@ -14,27 +14,20 @@ class Neural_Network(object):
         }
 
         # Our synapsis weights
-        self.W1 = np.random.randn(self.settings['inputSize'], self.settings['hiddenSize1']) # Input layer - hidden layer 1 (2x3)
-        self.W2 = np.random.randn(self.settings['hiddenSize1'], self.settings['hiddenSize2']) # Hidden layer 1 - hidden layer 2 (3x3)
-        self.W3 = np.random.randn(self.settings['hiddenSize2'], self.settings['outputSize']) # Hidden layer 2 - output layer (3x1)
-
+        self.W1 = Randn(self.settings['inputSize'], self.settings['hiddenSize1']) # Input layer - hidden layer 1 (2x3)
+        self.W2 = Randn(self.settings['hiddenSize1'], self.settings['hiddenSize2']) # Hidden layer 1 - hidden layer 2 (3x3)
+        self.W3 = Randn(self.settings['hiddenSize2'], self.settings['outputSize']) # Hidden layer 2 - output layer (3x1)
 
     # Forward propagation function
     def forward(self, X):
 
-        self.z = np.dot(X, self.W1) # Matrixial multiplication beetween the inputs (X) and W1
-        self.z2 = self.sigmoid(self.z) # Apply the activation (=sigmoid) function to the result (z)
-        self.z3 = np.dot(self.z2, self.W2) # Matrixial multiplication beetween the hidden (z2) and W2
-        output = self.sigmoid(self.z3) # Apply the activation (=sigmoid) function to the result (z3) and obtain our output
+        self.z = Matricial(X, self.W1) # Matrixial multiplication beetween the inputs (X) and W1
+        self.z2 = Sigmoid(self.z) # Apply the activation (=sigmoid) function to the result (z)
+        self.z3 = Matricial(self.z2, self.W2) # Matrixial multiplication beetween the hidden 1 (z2) and W2
+        self.z4 = Sigmoid(self.z3) # Apply the activation (=sigmoid) function to the result (z3)
+        self.z5 = Matricial(self.z4, self.W3) # Matrixial multiplication beetween the hidden 2 (z4) and W3
+        output = Sigmoid(self.z5) # Apply the activation (=sigmoid) function to the result (z5) and obtain our output
         return output
-
-    # Activation (=sigmoid) function
-    def sigmoid(self, s):
-        return 1/(1+np.exp(-s))
-
-    # Activation (=sigmoid) prime function
-    def sigmoidPrime(self, s):
-        return s * (1 - s)
 
     # Backward propagation function
     def backward(self, X, y, output):
@@ -42,12 +35,12 @@ class Neural_Network(object):
         # Calculate the error
         self.output_error = y - output
         # Apply the sigmoid prime to this error
-        self.output_delta_error = self.output_error*self.sigmoidPrime(output)
+        self.output_delta_error = self.output_error * self.SigmoidPrime(output)
 
         # Calculate the hidden layer error
         self.z2_error = self.output_delta_error.dot(self.W2.T)
         # Apply the sigmoid prime to this error
-        self.z2_delta_error = self.z2_error*self.sigmoidPrime(self.z2)
+        self.z2_delta_error = self.z2_error * SigmoidPrime(self.z2)
 
         # Ajust W1 weights
         self.W1 += X.T.dot(self.z2_delta_error)
